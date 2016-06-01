@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymelea.org">
+<head>
+<meta charset="ISO-8859-1"></meta>
+<title>Insert title here</title>
+</head>
+<body>
+	<h3>Student Registration</h3>
+	<form action="#" th:action="@{/saveStudent}" th:object="${student}" method="post">
+		<div th:if="${errorCodes}">
+		 	<div th:if="${errorCodes.responseCode}==100">
+		 		<script th:inline="javascript">
+					/*<![CDATA[*/
+					           window.onload = function()  {
+					        	   var MIDDLE_NAME = prompt([[${errorCodes.responseMessage}]], null);
+					        	   if (MIDDLE_NAME != null) {
+					        		   document.forms[0].middleName.value = MIDDLE_NAME;
+					        	   }
+											}
+		 			/*]]>*/
+				</script>
+		 	</div>
+		 	<div th:if="${errorCodes.responseCode}==500">
+		 		<script th:inline="javascript">
+					/*<![CDATA[*/
+					           window.onload = function()  {
+					        	   alert([[${errorCodes.responseMessage}]]);
+											}
+		 			/*]]>*/
+				</script>
+		 	</div>
+		 	<div th:if="${errorCodes.responseCode}==200">
+		 		<script th:inline="javascript">
+					/*<![CDATA[*/
+					           window.onload = function()  {
+					        	   alert([[${errorCodes.responseMessage}]]);
+					        	   window.location = '/saveStudent';
+											}
+		 			/*]]>*/
+				</script>
+		 	</div>
+		 </div>
+		 <input type="hidden" th:field="*{middleName}" id="middleName" />
+		<table>
+			<tr>
+				<td>First Name:</td>
+				<td><input type="text" th:field="*{firstName}" /></td>
+				<td th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">Title error message</td>
+			</tr>
+			<tr>
+				<td>Last Name:</td>
+				<td><input type="text" th:field="*{lastName}" /></td>
+				<td th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">Content error message</td>
+			</tr>
+			<tr>
+    		<td>Gender</td>
+    		
+        <td><input type="radio" th:field="*{gender}" th:value="Male" th:text="Male" /></td>
+        <td><input type="radio" th:field="*{gender}" th:value="Female" th:text="Female" /></td>
+        
+			</tr>
+			
+			<!--  <tr>
+				<td>Middle Name:</td>
+				<td><input type="text" th:field="*{middleName}" /></td>
+			</tr>
+			-->
+			
+			<tr>
+				<td>Date of Birth:</td>
+				<td>
+					<select th:field="*{day}">
+    					<option th:each="n : ${#numbers.sequence(01,31)}" th:value="${n}" th:text="${n}">Day</option>
+					</select>
+				</td>
+				<td>
+					<select th:field="*{month}">
+    					
+    					<option th:each="n : ${#numbers.sequence(01,12)}" th:value="${n}" th:text="${n}">Month</option>
+					</select>
+				</td>
+				<td>
+					<select th:field="*{year}">
+    					<option th:each="n : ${#numbers.sequence(1990,2016)}" th:value="${n}" th:text="${n}">Year</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+    		<td>Interested In</td>
+    		
+        <td><input type="checkbox" th:field="*{interestedIn}" th:value="Drums" th:text="Drums" /></td>
+        <td><input type="checkbox" th:field="*{interestedIn}" th:value="Guitar" th:text="Guitar" /></td>
+        <td><input type="checkbox" th:field="*{interestedIn}" th:value="Piano" th:text="Piano" /></td>
+    	
+
+			</tr>
+			<tr>
+    		<td>How did you come to know about us</td>
+    		
+        <td><input type="checkbox" th:field="*{referral}" th:value="friends" th:name="referral">Friends Or school mates</input></td>
+        <td><input type="checkbox" th:field="*{referral}" th:value="member"  th:name="referral">in building Member</input></td>
+        <td><input type="checkbox" th:field="*{referral}" th:value="others" th:text="Others" th:name="referral"/></td>
+    	
+
+			</tr>
+			
+			<tr>
+				<td><button type="submit">Save</button></td>
+			</tr>
+		</table>
+	</form>
+
+</body>
+</html>
