@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymelea.org">
+<head>
+<meta charset="ISO-8859-1"></meta>
+<title>Insert title here</title>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.js"> </script>
+        <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"> </script>
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+ 				
+</head>
+					
+<body>
+ <script type="text/javascript">
+			
+			$(document).ready(function() {
+    $(function() {
+        $("#student").autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: "/getTags",
+                    type: "GET",
+                    data: request,
+                    error: function(e) {
+                        console.log(e);
+                      },
+
+                    dataType: "json",
+                    
+
+                    success: function(data) {
+                    	response($.map(data, function(v,i){
+                    	    return {
+                    	                label: v.studentName,
+                    	                value: v.studentName
+                    	               };
+                    	}));
+                    }
+               });              
+            }   
+        });
+    });
+});
+			
+			
+			
+			
+			
+			
+			
+					</script>	
+		<h3>Student Sign Up</h3>
+			<form action="#" th:action="@{/studentSignInDetails}" th:object="${student}" method="post">
+					
+					<div class="ui-widget">
+					
+							<label for="student">Student: </label>
+ 								<input id="student" class="text ui-widget-content ui-corner-all" th:field="*{studentName}"/>
+ 								<div th:if="${#fields.hasErrors('studentName')}" th:errors="*{studentName}">Title error message</div>
+ 								<button type="submit">Save</button>
+					</div>	
+					
+			</form>
+			
+			
+			
+</body>
+
+
+</html>
