@@ -7,7 +7,7 @@ package com.org.musicAndYouthAttend.response;
  * The class to represent the Db response while registering Student.
  * The Response code will map to a Property file.
  * 
- * @author garim
+ * @author  Music and Youth Organization
  *
  */
 public class StudentRegistrationResponse {
