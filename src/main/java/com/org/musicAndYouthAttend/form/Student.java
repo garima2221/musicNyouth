@@ -36,7 +36,7 @@ public class Student {
 	 * @param dateOfJoining
 	 * @param accomplishments
 	 */
-	public Student(String studentId,String firstName, String lastName, String middleName,String gender,LocalDate dateOfBirth,List<String> referral,
+	public Student(String studentId,String firstName, String lastName, String middleName,String studentName,String gender,LocalDate dateOfBirth,List<String> referral,
 									List<String> interestedIn, String centerId,Date dateOfJoining, String alias, String userId, String password, 
 									String accomplishments) {
 		
@@ -44,6 +44,7 @@ public class Student {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.middleName = middleName;
+		this.studentName=studentName;
 		this.gender=gender;
 		this.dateOfBirth = dateOfBirth;
 		this.referral = referral;
@@ -54,6 +55,7 @@ public class Student {
 		this.userId = userId;
 		this.password = password;
 		this.accomplishments = accomplishments;
+		
 	}
 
 	/* (non-Javadoc)
@@ -66,6 +68,22 @@ public class Student {
 				+ dateOfBirth + ", referral=" + referral + ", userId=" + userId + ", password=" + password
 				+ ", interestedIn=" + interestedIn + ", dateOfJoining=" + dateOfJoining + ", accomplishments="
 				+ accomplishments + "]";
+	}
+	
+	private String studentName;
+
+	/**
+	 * @return the studentName
+	 */
+	public String getStudentName() {
+		return studentName;
+	}
+
+	/**
+	 * @param studentName the studentName to set
+	 */
+	public void setStudentName(String studentName) {
+		this.studentName = studentName;
 	}
 
 	/**
@@ -147,6 +165,24 @@ public class Student {
 	private String month;
 	
 	private String year;
+	
+	private String name;
+	
+	
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	/**
 	 * @return the firstName
