@@ -3,8 +3,6 @@
  */
 package com.org.musicAndYouthAttend.service;
 
-import java.util.List;
-
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.org.musicAndYouthAttend.form.Vocation;
@@ -15,5 +13,5 @@ import com.org.musicAndYouthAttend.form.Vocation;
  */
 public interface VocationRepository  extends MongoRepository<Vocation, String> {
 
-	public List<Vocation> findVocationByCenterId(String centerId);
+	public Vocation findVocationByCenterId(String centerId);
 }

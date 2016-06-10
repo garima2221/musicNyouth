@@ -3,22 +3,34 @@
  */
 package com.org.musicAndYouthAttend.form;
 
-import org.springframework.data.annotation.Id;
-
 /**
- * @author garim
+ * @author Music and Youth Organization
  *
  */
 public class Accomplishment {
+	
+	private String studentId;
 	
 	private String name;
 	
 	private String comments;
 	
-	@Id
 	
-	private Long id;
 
+	/**
+	 * @return the studentId
+	 */
+	public String getStudentId() {
+		return studentId;
+	}
+
+	/**
+	 * @param studentId the studentId to set
+	 */
+	public void setStudentId(String studentId) {
+		this.studentId = studentId;
+	}
+	
 	/**
 	 * @return the name
 	 */
@@ -47,19 +59,7 @@ public class Accomplishment {
 		this.comments = comments;
 	}
 
-	/**
-	 * @return the id
-	 */
-	public Long getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-		this.id = id;
-	}
+	
 	
 	
 

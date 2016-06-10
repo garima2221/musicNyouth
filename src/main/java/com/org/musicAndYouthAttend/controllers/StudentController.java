@@ -26,9 +26,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.org.musicAndYouthAttend.Helper.StudentHelper;
+import com.org.musicAndYouthAttend.form.Accomplishment;
 import com.org.musicAndYouthAttend.form.Student;
+import com.org.musicAndYouthAttend.form.StudentSignUp;
+import com.org.musicAndYouthAttend.form.Vocation;
 import com.org.musicAndYouthAttend.response.StudentRegistrationResponse;
+import com.org.musicAndYouthAttend.response.StudentSignUpResponse;
+import com.org.musicAndYouthAttend.serviceImpl.AccomplishmentService;
 import com.org.musicAndYouthAttend.serviceImpl.StudentService;
+import com.org.musicAndYouthAttend.serviceImpl.StudentSignUpService;
+import com.org.musicAndYouthAttend.serviceImpl.VocationService;
 
 
 
@@ -43,6 +50,12 @@ import com.org.musicAndYouthAttend.serviceImpl.StudentService;
 public class StudentController {
 	@Autowired
 	private StudentService studentService;
+	@Autowired
+	private StudentSignUpService studentSignUpService;
+	@Autowired
+	private VocationService vocationService;
+	@Autowired
+	private AccomplishmentService accomplishmentService;
 	@Autowired
 	private StudentHelper helper; 
 	
@@ -61,8 +74,10 @@ public class StudentController {
 	@RequestMapping(value="/saveStudent", method=RequestMethod.GET)
 	public String getStudentData(Model model,HttpServletResponse response){
 		response.addCookie(new Cookie("CenterId", "MAS"));
+		//TODO remove centerID logic from here and move it to authorization page
 		model.addAttribute("student",new Student());
-		
+		Vocation vocations=vocationService.getVocations("MAS");
+		model.addAttribute("vocations", vocations.getVocations());
 		return "studentData";
 	}
 	
@@ -94,24 +109,51 @@ public class StudentController {
 			studentId = student.getFirstName() + student.getLastName() + student.getCenterId();
 			studentName= student.getFirstName() +' '+ student.getLastName();
 		}
+		student.setStudentId(studentId);
+		student.setStudentName(studentName);
+		LocalDate dateOfBirth = helper.getDate(student);
+		student.setDateOfBirth(dateOfBirth);
 		Student duplicateStudent = studentService.findStudent(studentId);
 		if (duplicateStudent != null) {
-			LocalDate dateOfBirth = helper.getDate(student);
+			//LocalDate dateOfBirth = helper.getDate(student);
 
-			if (duplicateStudent.getDateOfBirth().equals(dateOfBirth)) {
+			if (duplicateStudent.getDateOfBirth().equals(student.getDateOfBirth())) {
 				srr.setResponseCode(100);
 				srr.setResponseMessage("Duplicate Record, Please enter middle name");
 				model.addAttribute("errorCodes", srr);
 				model.addAttribute("student", student);
-				return "studentData";
 			}
+			else{
+				studentName=student.getStudentName()+" "+student.getMonth()+'-'+student.getDay()+'-'+student.getYear();
+				student.setStudentName(studentName);
+				studentId=student.getStudentName().replaceAll(" ", "")+student.getCenterId();
+				student.setStudentId(studentId);
+				saveStudent(student, model, srr);
+			}
+			
 		}
-		student.setStudentId(studentId);
-		student.setStudentName(studentName);
+		else{
+					saveStudent(student, model, srr);
+					
+				}
+		Vocation vocations=vocationService.getVocations(centerId);
+		model.addAttribute("vocations", vocations.getVocations());
+		return "studentData";
+	}
+
+	/**
+	 * @param student
+	 * @param model
+	 * @param studentId
+	 * @param studentName
+	 * @param srr
+	 */
+	private void saveStudent(Student student, Model model, StudentRegistrationResponse srr) {
+		
 		// Setting userId and password same as studentId, which is first
 		// name+last name+middle name(if not null)+centerId
-		student.setUserId(studentId);
-		student.setPassword(studentId);
+		student.setUserId(student.getStudentId());
+		student.setPassword(student.getStudentId());
 		//student.deleteAll();
 		Student studentSaved = studentService.studentSave(student);
 
@@ -120,14 +162,15 @@ public class StudentController {
 			srr.setResponseMessage("Save Failed");
 			model.addAttribute("errorCodes", srr);
 			model.addAttribute("student", studentSaved);
-			return "studentData";
+			
 		}
-		srr.setResponseCode(HttpStatus.OK.value());
-		srr.setResponseMessage("Save Successful");
-		model.addAttribute("errorCodes", srr);
-		model.addAttribute("student", studentSaved);
-		System.out.println(studentSaved.toString());
-		return "saved";
+		else{
+			srr.setResponseCode(HttpStatus.OK.value());
+			srr.setResponseMessage("Save Successful");
+			model.addAttribute("errorCodes", srr);
+			model.addAttribute("student", studentSaved);
+			System.out.println(studentSaved.toString());
+		}
 	}
 	
 	/**
@@ -145,6 +188,12 @@ public class StudentController {
 		return "studentSignIn";
 	}
 	
+	/**
+	 * Controllor method to get students for autocomplete search box.
+	 * 
+	 * @param term
+	 * @return
+	 */
 	@RequestMapping(value = "/getTags", method = RequestMethod.GET, produces = "application/json")	
 	 public @ResponseBody List<Student> getStudents( @RequestParam String term) {
 		
@@ -152,6 +201,12 @@ public class StudentController {
 
 	}
 
+	/**
+	 * Gets the students which match the criteria for autocomplete search box
+	 * 
+	 * @param tagName
+	 * @return list of students
+	 */
 	private List<Student> simulateSearchResult(String tagName) {
 		List<Student> data=new ArrayList<Student>();
 		List<Student> result = new ArrayList<Student>();
@@ -161,8 +216,7 @@ public class StudentController {
 
 		// iterate a list and filter by tagName
 		for (Student tag : data) {
-			if (tag.getFirstName().toLowerCase().contains(tagName) || tag.getLastName().toLowerCase().contains(tagName)
-					|| (tag.getMiddleName() != null && tag.getMiddleName().toLowerCase().contains(tagName))) {
+			if (tag.getStudentName().toLowerCase().contains(tagName)) {
 				result.add(tag);
 			}
 		}
@@ -171,7 +225,54 @@ public class StudentController {
 	}
 	
 	/**
+	 * Gets the sign up page for the student 
 	 * 
+	 * @param student
+	 * @param bindingResult
+	 * @param model
+	 * @param centerId
+	 * @return view
+	 */
+	@RequestMapping(value="/studentSignInDetails", method=RequestMethod.GET)
+	public String getSignInStudent(Student student,BindingResult bindingResult, Model model, 
+			@CookieValue(value = "CenterId", defaultValue = "BOS") String centerId) {
+		
+		StudentSignUpResponse signUpResponse=new StudentSignUpResponse();
+		if(student.getStudentName()==null){
+			signUpResponse.setResponseCode(300);
+			signUpResponse.setResponseMessage("please enter the student");
+			model.addAttribute("errorCodes", signUpResponse);
+			model.addAttribute("student", student);
+			return "studentSignIn";
+		}
+		student.setCenterId(centerId);
+		String studentId;
+		String stdName=student.getStudentName();
+		stdName=stdName.replaceAll(" ", "");
+		studentId=stdName+student.getCenterId();
+		Student studentPresent =studentService.findStudent(studentId);
+		
+		if(studentPresent==null){
+			signUpResponse.setResponseCode(100);
+			signUpResponse.setResponseMessage("No Student By this name present at this center");
+			model.addAttribute("errorCodes", signUpResponse);
+			model.addAttribute("student", student);
+			return "studentSignIn";
+		}
+		Vocation vocations=vocationService.getVocations(centerId);
+		model.addAttribute("vocations", vocations.getVocations());
+		//TODO add side pane for accomplishments
+		List<Accomplishment>accomplishments=accomplishmentService.getAccomplishments(studentId);
+		model.addAttribute("accomplishments", accomplishments);
+		model.addAttribute("student", student);
+		StudentSignUp signUp=new StudentSignUp();
+		signUp.setStudentId(studentId);
+		model.addAttribute("studentSignUp", signUp);
+		return "studentSignInDetails";
+	}
+	
+	/**
+	 * Signs up the student for interested classes
 	 * 
 	 * @param student
 	 * @param bindingResult
@@ -179,25 +280,32 @@ public class StudentController {
 	 * @param centerId
 	 * @return
 	 */
-	@RequestMapping(value="/studentSignInDetails", method=RequestMethod.GET)
-	public String getSignInStudent(@Valid Student student,BindingResult bindingResult, Model model, 
-			@CookieValue(value = "CenterId", defaultValue = "BOS") String centerId) {
-		if (bindingResult.hasErrors()) {
-			return "studentSignIn";
-		}
-		/*student.setCenterId(centerId);
-		String studentId;
-		studentId=student.getStudentName()+student.getCenterId();
-		student =studentService.findStudent(studentId);
-		model.addAttribute("student", student);*/
-		return "studentSignInDetails";
-	}
-	
 	@RequestMapping(value="/studentSignInDetails", method=RequestMethod.POST)
-	public String signInStudent(@Valid Student student,BindingResult bindingResult, Model model, 
+	public String signInStudent(@Valid StudentSignUp studentSignUp,BindingResult bindingResult, Model model, 
 			@CookieValue(value = "CenterId", defaultValue = "BOS") String centerId) {
 		
-		return "studentSignIn";
+		if (bindingResult.hasErrors()) {
+			return "studentSignInDetails";
+		}
+		StudentSignUpResponse signUpResponse=new StudentSignUpResponse();
+		//TODO add modified by logic
+		StudentSignUp confirmSignUp=studentSignUpService.signUpSave(studentSignUp);
+		if(confirmSignUp==null){
+			signUpResponse.setResponseCode(500);
+			signUpResponse.setResponseMessage("Error in signing up. Please try again later");
+		}
+		else{
+			signUpResponse.setResponseCode(HttpStatus.OK.value());
+			signUpResponse.setResponseMessage("Sign up successful");
+		}
+		model.addAttribute("errorCodes", signUpResponse);
+		Student student =studentService.findStudent(studentSignUp.getStudentId());
+		model.addAttribute("student", student);
+		Vocation vocations=vocationService.getVocations(centerId);
+		model.addAttribute("vocations", vocations.getVocations());
+		List<Accomplishment>accomplishments=accomplishmentService.getAccomplishments(studentSignUp.getStudentId());
+		model.addAttribute("accomplishments", accomplishments);
+		return "studentSignInDetails";
 	}
 	
 	

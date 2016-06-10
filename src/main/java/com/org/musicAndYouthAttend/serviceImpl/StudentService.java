@@ -3,14 +3,12 @@
  */
 package com.org.musicAndYouthAttend.serviceImpl;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.org.musicAndYouthAttend.Helper.StudentHelper;
 import com.org.musicAndYouthAttend.form.Student;
 import com.org.musicAndYouthAttend.service.StudentRepository;
 
@@ -25,8 +23,6 @@ public class StudentService {
 	@Autowired
 	private StudentRepository studentRep;
 	
-	@Autowired
-	private StudentHelper helper; 
 	/**
 	 * Registers student in the system
 	 * 
@@ -34,9 +30,6 @@ public class StudentService {
 	 * @return
 	 */
 	public Student studentSave(Student student){
-		
-		LocalDate dateOfBirth = helper.getDate(student);
-		student.setDateOfBirth(dateOfBirth);
 		Date sysdate=new Date();
 		Student confirmSave=studentRep.save(new Student(student.getStudentId(),student.getFirstName(),student.getLastName(),
 																										student.getMiddleName(),student.getStudentName(),student.getGender(),student.getDateOfBirth(),student.getReferral(),

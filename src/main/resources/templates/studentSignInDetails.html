@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymelea.org">
+<head>
+<meta charset="ISO-8859-1"></meta>
+<title>Insert title here</title>
+</head>
+<body>
+	<h3>Student Sign Up</h3>
+	<form action="#" th:action="@{/studentSignInDetails}" th:object="${studentSignUp}" method="post">
+		<div th:if="${errorCodes}">
+			<div th:if="${errorCodes.responseCode}==500">
+			 		<script th:inline="javascript">
+						/*<![CDATA[*/
+						           window.onload = function()  {
+						        	   alert([[${errorCodes.responseMessage}]]);
+												}
+			 			/*]]>*/
+					</script>
+			 	</div>
+			 	<div th:if="${errorCodes.responseCode}==100">
+			 		<script th:inline="javascript">
+						/*<![CDATA[*/
+						           window.onload = function()  {
+						        	   alert([[${errorCodes.responseMessage}]]);
+												}
+			 			/*]]>*/
+					</script>
+			 	</div>
+			 	<div th:if="${errorCodes.responseCode}==200">
+			 		<script th:inline="javascript">
+						/*<![CDATA[*/
+						           if(confirm([[${errorCodes.responseMessage}]])) {
+											    window.location.href = "/studentSignIn"
+											}
+			 			/*]]>*/
+					</script>
+			 	</div>
+			</div>
+			<input type="hidden" th:field="*{studentId}" id="studentId" />
+			<div>
+					<p> Hi <label th:text="${student.studentName}"></label>, what are you interested in learning today?</p>
+			
+			</div>
+			<div th:if="${vocations}!=null">
+					<div th:each="vocation, vocations:${vocations}">
+							<input type="checkbox" th:field="*{interestedIn}" th:value="${vocation}" th:text="${vocation}" />
+					</div>
+			</div>
+			<div>
+				<button type="submit">Submit</button>
+			</div>
+	</form>
+</body>
+</html>

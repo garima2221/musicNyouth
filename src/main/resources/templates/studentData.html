@@ -32,10 +32,11 @@
 		 	<div th:if="${errorCodes.responseCode}==200">
 		 		<script th:inline="javascript">
 					/*<![CDATA[*/
-					           window.onload = function()  {
-					        	   alert([[${errorCodes.responseMessage}]]);
-					        	   window.location = '/saveStudent';
+					           
+					            if(confirm([[${errorCodes.responseMessage}]])) {
+											    window.location.href = "/saveStudent"
 											}
+					           
 		 			/*]]>*/
 				</script>
 		 	</div>
@@ -86,11 +87,11 @@
 				</td>
 			</tr>
 			<tr>
-    		<td>Interested In</td>
+    		<td th:if="${vocations}!=null">Interested In</td>
     		
-        <td><input type="checkbox" th:field="*{interestedIn}" th:value="Drums" th:text="Drums" /></td>
-        <td><input type="checkbox" th:field="*{interestedIn}" th:value="Guitar" th:text="Guitar" /></td>
-        <td><input type="checkbox" th:field="*{interestedIn}" th:value="Piano" th:text="Piano" /></td>
+        <td th:each="vocation, vocations:${vocations}"><input type="checkbox" th:field="*{interestedIn}" th:value="${vocation}" th:text="${vocation}" /></td>
+        <!--  <td><input type="checkbox" th:field="*{interestedIn}" th:value="Guitar" th:text="Guitar" /></td>
+        <td><input type="checkbox" th:field="*{interestedIn}" th:value="Piano" th:text="Piano" /></td>-->
     	
 
 			</tr>

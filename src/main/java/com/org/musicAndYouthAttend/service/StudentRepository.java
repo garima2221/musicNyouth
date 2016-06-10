@@ -15,5 +15,4 @@ import com.org.musicAndYouthAttend.form.Student;
 public interface StudentRepository extends MongoRepository<Student, String> {
 	
 	public Student findStudentByStudentId(String studentId);
-
 }

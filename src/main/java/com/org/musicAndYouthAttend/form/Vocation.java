@@ -11,21 +11,10 @@ import java.util.List;
  */
 public class Vocation {
 	
-	private int id;
+	
 	private String centerId;
 	private List<String> vocations;
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
+	
 	/**
 	 * @return the centerId
 	 */
