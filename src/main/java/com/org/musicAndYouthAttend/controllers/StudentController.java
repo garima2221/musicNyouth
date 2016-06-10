@@ -4,6 +4,8 @@
 package com.org.musicAndYouthAttend.controllers;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.org.musicAndYouthAttend.Helper.StudentHelper;
 import com.org.musicAndYouthAttend.form.Student;
@@ -79,15 +83,18 @@ public class StudentController {
 			return "studentData";
 		}
 		String studentId;
+		String studentName;
 		StudentRegistrationResponse srr = new StudentRegistrationResponse();
 		student.setCenterId(centerId);
 		if (student.getMiddleName() != null) {
 			studentId = student.getFirstName() + student.getLastName() + student.getMiddleName()
 					+ student.getCenterId();
+			studentName= student.getFirstName() +' '+student.getMiddleName()+' '+ student.getLastName();
 		} else {
 			studentId = student.getFirstName() + student.getLastName() + student.getCenterId();
+			studentName= student.getFirstName() +' '+ student.getLastName();
 		}
-		Student duplicateStudent = studentService.findDuplicateStudent(studentId);
+		Student duplicateStudent = studentService.findStudent(studentId);
 		if (duplicateStudent != null) {
 			LocalDate dateOfBirth = helper.getDate(student);
 
@@ -100,10 +107,12 @@ public class StudentController {
 			}
 		}
 		student.setStudentId(studentId);
+		student.setStudentName(studentName);
 		// Setting userId and password same as studentId, which is first
 		// name+last name+middle name(if not null)+centerId
 		student.setUserId(studentId);
 		student.setPassword(studentId);
+		//student.deleteAll();
 		Student studentSaved = studentService.studentSave(student);
 
 		if (studentSaved == null) {
@@ -136,6 +145,31 @@ public class StudentController {
 		return "studentSignIn";
 	}
 	
+	@RequestMapping(value = "/getTags", method = RequestMethod.GET, produces = "application/json")	
+	 public @ResponseBody List<Student> getStudents( @RequestParam String term) {
+		
+		return simulateSearchResult(term);
+
+	}
+
+	private List<Student> simulateSearchResult(String tagName) {
+		List<Student> data=new ArrayList<Student>();
+		List<Student> result = new ArrayList<Student>();
+		data =studentService.findAllStudent(data) ;
+		
+		
+
+		// iterate a list and filter by tagName
+		for (Student tag : data) {
+			if (tag.getFirstName().toLowerCase().contains(tagName) || tag.getLastName().toLowerCase().contains(tagName)
+					|| (tag.getMiddleName() != null && tag.getMiddleName().toLowerCase().contains(tagName))) {
+				result.add(tag);
+			}
+		}
+
+		return result;
+	}
+	
 	/**
 	 * 
 	 * 
@@ -145,10 +179,26 @@ public class StudentController {
 	 * @param centerId
 	 * @return
 	 */
-	@RequestMapping(value="/studentSignIn", method=RequestMethod.POST)
+	@RequestMapping(value="/studentSignInDetails", method=RequestMethod.GET)
+	public String getSignInStudent(@Valid Student student,BindingResult bindingResult, Model model, 
+			@CookieValue(value = "CenterId", defaultValue = "BOS") String centerId) {
+		if (bindingResult.hasErrors()) {
+			return "studentSignIn";
+		}
+		/*student.setCenterId(centerId);
+		String studentId;
+		studentId=student.getStudentName()+student.getCenterId();
+		student =studentService.findStudent(studentId);
+		model.addAttribute("student", student);*/
+		return "studentSignInDetails";
+	}
+	
+	@RequestMapping(value="/studentSignInDetails", method=RequestMethod.POST)
 	public String signInStudent(@Valid Student student,BindingResult bindingResult, Model model, 
 			@CookieValue(value = "CenterId", defaultValue = "BOS") String centerId) {
 		
-		return "studentSignInDetails";
+		return "studentSignIn";
 	}
+	
+	
 }
