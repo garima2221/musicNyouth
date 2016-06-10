@@ -13,6 +13,17 @@ import java.util.List;
  */
 public class StudentSignUp {
 	
+	public StudentSignUp(){
+		
+	}
+	
+	public StudentSignUp(Date date, String studentId, List<String> interestedIn, String modifiedBy) {
+		this.date = date;
+		this.studentId = studentId;
+		this.interestedIn = interestedIn;
+		this.modifiedBy = modifiedBy;
+	}
+
 	private Date date;
 	
 	private String studentId;
