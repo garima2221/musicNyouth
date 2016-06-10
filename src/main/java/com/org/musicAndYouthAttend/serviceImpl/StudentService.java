@@ -5,6 +5,7 @@ package com.org.musicAndYouthAttend.serviceImpl;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class StudentService {
 		student.setDateOfBirth(dateOfBirth);
 		Date sysdate=new Date();
 		Student confirmSave=studentRep.save(new Student(student.getStudentId(),student.getFirstName(),student.getLastName(),
-																										student.getMiddleName(),student.getGender(),student.getDateOfBirth(),student.getReferral(),
+																										student.getMiddleName(),student.getStudentName(),student.getGender(),student.getDateOfBirth(),student.getReferral(),
 																										student.getInterestedIn(),student.getCenterId(),sysdate,student.getAlias(),
 																										student.getUserId(),student.getPassword(),student.getAccomplishments()));
 		return confirmSave;
@@ -52,10 +53,14 @@ public class StudentService {
 	 * @param studentId
 	 * @return
 	 */
-	public Student findDuplicateStudent(String studentId){
+	public Student findStudent(String studentId){
 		
-		Student duplicateStudent=studentRep.findStudentByStudentId(studentId);
-		return duplicateStudent;
+		Student student=studentRep.findStudentByStudentId(studentId);
+		return student;
 	}
-
+	
+	public List<Student> findAllStudent(List<Student> data){
+		List<Student> students=studentRep.findAll();
+		return students;
+	}
 }
