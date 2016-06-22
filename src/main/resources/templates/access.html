@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymelea.org">
+<head>
+<meta charset="ISO-8859-1"></meta>
+<title>Insert title here</title>
+</head>
+<body>
+		<div>
+				<p>Welcome <label th:text="${user.name}"></label>, what would you like to do today</p>
+		</div>
+		<table>
+				<tr>
+						<td th:if="${accessTo.contains('register')}">
+								<a th:href="@{/saveStudent}">Register new user</a>
+						</td>
+						<td th:if="${accessTo.contains('signIn')}">
+								<a th:href="@{/studentSignIn}">Student sign-in</a>
+						</td>
+						<td th:if="${accessTo.contains('attendance')}">
+								<a th:href="@{/getAttendence}">Lesson Attendance</a>
+						</td>
+				</tr>
+		</table>
+</body>
+</html>

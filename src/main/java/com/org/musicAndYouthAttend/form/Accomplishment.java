@@ -3,6 +3,8 @@
  */
 package com.org.musicAndYouthAttend.form;
 
+import org.springframework.data.annotation.Id;
+
 /**
  * @author Music and Youth Organization
  *
@@ -15,7 +17,24 @@ public class Accomplishment {
 	
 	private String comments;
 	
+	@Id
+	private Integer _id;
 	
+	
+
+	/**
+	 * @return the _id
+	 */
+	public Integer get_id() {
+		return _id;
+	}
+
+	/**
+	 * @param _id the _id to set
+	 */
+	public void set_id(Integer _id) {
+		this._id = _id;
+	}
 
 	/**
 	 * @return the studentId

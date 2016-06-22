@@ -34,7 +34,7 @@
 					/*<![CDATA[*/
 					           
 					            if(confirm([[${errorCodes.responseMessage}]])) {
-											    window.location.href = "/saveStudent"
+											    window.location.href = "/getAccess"
 											}
 					           
 		 			/*]]>*/
@@ -71,19 +71,27 @@
 				<td>Date of Birth:</td>
 				<td>
 					<select th:field="*{day}">
-    					<option th:each="n : ${#numbers.sequence(01,31)}" th:value="${n}" th:text="${n}">Day</option>
+    					<option th:each="n : ${#numbers.sequence(01,31)}" th:value="${n}" th:text="${n}"></option>
 					</select>
+				</td>
+				<td>
+					Day
 				</td>
 				<td>
 					<select th:field="*{month}">
-    					
-    					<option th:each="n : ${#numbers.sequence(01,12)}" th:value="${n}" th:text="${n}">Month</option>
+    					<option th:each="n : ${#numbers.sequence(01,12)}" th:value="${n}" th:text="${n}"></option>
 					</select>
 				</td>
 				<td>
+					Month
+				</td>
+				<td>
 					<select th:field="*{year}">
-    					<option th:each="n : ${#numbers.sequence(1990,2016)}" th:value="${n}" th:text="${n}">Year</option>
+    					<option th:each="n : ${#numbers.sequence(1990,2016)}" th:value="${n}" th:text="${n}"></option>
 					</select>
+				</td>
+				<td>
+					Year
 				</td>
 			</tr>
 			<tr>

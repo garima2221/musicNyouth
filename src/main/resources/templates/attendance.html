@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymelea.org">
+	<head>
+	<meta charset="ISO-8859-1"></meta>
+	<title>Insert title here</title>
+	
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.js"> </script>
+	<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"> </script>
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+	<script type="text/javascript" src="scripts/autocompleteBox.js"> </script>
+	</head>
+	<body>
+			<h3>Student Sign Up</h3>
+			<form action="#" th:action="@{/submitAttendence}" th:object="${attendance}" method="POST">
+					<div class="ui-widget">
+							<label for="student">Student: </label>
+ 								<input id="student" class="text ui-widget-content ui-corner-all"/>
+ 								<!--  <div th:if="${#fields.hasErrors('studentName')}" th:errors="*{studentName}">Title error message</div>-->
+					</div>
+					<div></div>
+					<div></div>
+					<!--  <div th:if="${vocations}!=null">
+					<div th:each="vocation, vocations:${vocations}">
+							<input type="checkbox" th:field="*{vocation}" th:value="${vocation}" th:text="${vocation}" />
+					</div>
+			</div>-->
+					<br/>
+					<br/>
+				<div>
+							  <label>Vocation</label>
+							<select th:field="*{vocation}" th:text="Vocation">
+    							<option th:each="vocation, vocations:${vocations}" th:value="${vocation}" th:text="${vocation}"></option>
+							</select>
+					</div>
+					<table>
+							<tr>
+									<td>Date of Attendance:</td>
+									<td>
+										<select th:field="*{day}">
+					    					<option th:each="n : ${#numbers.sequence(01,31)}" th:value="${n}" th:text="${n}"></option>
+										</select>
+									</td>
+									<td>
+										Day
+									</td>
+									<td>
+										<select th:field="*{month}">
+					    					<option th:each="n : ${#numbers.sequence(01,12)}" th:value="${n}" th:text="${n}"></option>
+										</select>
+									</td>
+									<td>
+										Month
+									</td>
+									<td>
+										<select th:field="*{year}">
+					    					<option th:each="n : ${#numbers.sequence(2015,2016)}" th:value="${n}" th:text="${n}"></option>
+										</select>
+									</td>
+									<td>
+										Year
+									</td>
+							</tr>
+					
+					</table>
+					<div>
+							<button type="submit">Submit</button>
+					</div>
+			
+			</form>
+	</body>
+</html>

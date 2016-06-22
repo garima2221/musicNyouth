@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Component;
 
+import com.org.musicAndYouthAttend.form.Attendance;
 import com.org.musicAndYouthAttend.form.Student;
 
 /**
@@ -34,5 +35,26 @@ public class StudentHelper {
 		DateTimeFormatter formatter=DateTimeFormatter.ofPattern("MM-dd-yyyy");
 		LocalDate dateOfBirth=LocalDate.parse(date,formatter);
 		return dateOfBirth;
+	}
+	
+	
+	/**
+	 * @param attendance
+	 * @return
+	 */
+	public LocalDate getDate(Attendance attendance) {
+		String date;
+		if(Integer.parseInt(attendance.getDay())<10){
+			attendance.setDay("0"+attendance.getDay());
+		}
+	
+		if(Integer.parseInt(attendance.getMonth())<10){
+			attendance.setMonth("0"+attendance.getMonth());
+		}
+			
+		date=attendance.getMonth()+"-"+attendance.getDay()+"-"+attendance.getYear();
+		DateTimeFormatter formatter=DateTimeFormatter.ofPattern("MM-dd-yyyy");
+		LocalDate finalDate=LocalDate.parse(date,formatter);
+		return finalDate;
 	}
 }

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymelea.org">
+<head>
+<meta charset="ISO-8859-1"></meta>
+<title>Insert title here</title>
+</head>
+	<body>
+			<form action="#" th:action="@{/signIn}" th:object="${user}" method="post">
+				<table>
+						<tr>
+							<td>UserName:</td>
+							<td><input type="text" th:field="*{userId}" /></td>
+							<td th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">Content error message</td>
+						</tr>
+						<tr>
+							<td>Password:</td>
+							<td><input type="password" th:field="*{password}" /></td>
+							<td th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Content error message</td>
+						</tr>
+						<tr>
+							<td><button type="submit">Submit</button></td>
+						</tr>
+				</table>
+			</form>
+	</body>
+</html>

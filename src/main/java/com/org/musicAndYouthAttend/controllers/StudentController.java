@@ -27,12 +27,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.org.musicAndYouthAttend.Helper.StudentHelper;
 import com.org.musicAndYouthAttend.form.Accomplishment;
+import com.org.musicAndYouthAttend.form.Attendance;
 import com.org.musicAndYouthAttend.form.Student;
 import com.org.musicAndYouthAttend.form.StudentSignUp;
 import com.org.musicAndYouthAttend.form.Vocation;
 import com.org.musicAndYouthAttend.response.StudentRegistrationResponse;
 import com.org.musicAndYouthAttend.response.StudentSignUpResponse;
+import com.org.musicAndYouthAttend.response.SubmitAttendanceResponse;
 import com.org.musicAndYouthAttend.serviceImpl.AccomplishmentService;
+import com.org.musicAndYouthAttend.serviceImpl.AttendanceService;
 import com.org.musicAndYouthAttend.serviceImpl.StudentService;
 import com.org.musicAndYouthAttend.serviceImpl.StudentSignUpService;
 import com.org.musicAndYouthAttend.serviceImpl.VocationService;
@@ -56,6 +59,8 @@ public class StudentController {
 	private VocationService vocationService;
 	@Autowired
 	private AccomplishmentService accomplishmentService;
+	@Autowired
+	private AttendanceService attendanceService;
 	@Autowired
 	private StudentHelper helper; 
 	
@@ -117,19 +122,20 @@ public class StudentController {
 		if (duplicateStudent != null) {
 			//LocalDate dateOfBirth = helper.getDate(student);
 
-			if (duplicateStudent.getDateOfBirth().equals(student.getDateOfBirth())) {
+			//if (duplicateStudent.getDateOfBirth().equals(student.getDateOfBirth())) {
 				srr.setResponseCode(100);
 				srr.setResponseMessage("Duplicate Record, Please enter middle name");
 				model.addAttribute("errorCodes", srr);
 				model.addAttribute("student", student);
-			}
+		/*	}
 			else{
+				//TODO confirm duplicate logic
 				studentName=student.getStudentName()+" "+student.getMonth()+'-'+student.getDay()+'-'+student.getYear();
 				student.setStudentName(studentName);
 				studentId=student.getStudentName().replaceAll(" ", "")+student.getCenterId();
 				student.setStudentId(studentId);
 				saveStudent(student, model, srr);
-			}
+			}*/
 			
 		}
 		else{
@@ -189,7 +195,7 @@ public class StudentController {
 	}
 	
 	/**
-	 * Controllor method to get students for autocomplete search box.
+	 * Controller method to get students for autocomplete search box.
 	 * 
 	 * @param term
 	 * @return
@@ -212,8 +218,6 @@ public class StudentController {
 		List<Student> result = new ArrayList<Student>();
 		data =studentService.findAllStudent(data) ;
 		
-		
-
 		// iterate a list and filter by tagName
 		for (Student tag : data) {
 			if (tag.getStudentName().toLowerCase().contains(tagName)) {
@@ -288,8 +292,21 @@ public class StudentController {
 			return "studentSignInDetails";
 		}
 		StudentSignUpResponse signUpResponse=new StudentSignUpResponse();
-		//TODO add modified by logic
-		StudentSignUp confirmSignUp=studentSignUpService.signUpSave(studentSignUp);
+		StudentSignUp alreadySignUp=studentSignUpService.getSignUpForToday(LocalDate.now(), studentSignUp.getStudentId());
+		StudentSignUp confirmSignUp=null;
+		//update record if already signed up for the day
+		if(alreadySignUp!=null){
+			studentSignUp.set_id(alreadySignUp.get_id());
+			studentSignUp.setDate(alreadySignUp.getDate());
+			confirmSignUp=studentSignUpService.signUpUpdate(studentSignUp);
+		}
+		else{
+			Integer id=studentSignUpService.getCount()+1;
+			studentSignUp.set_id(id);
+			studentSignUp.setDate(LocalDate.now());
+			confirmSignUp=studentSignUpService.signUpSave(studentSignUp);
+		}
+		
 		if(confirmSignUp==null){
 			signUpResponse.setResponseCode(500);
 			signUpResponse.setResponseMessage("Error in signing up. Please try again later");
@@ -308,5 +325,86 @@ public class StudentController {
 		return "studentSignInDetails";
 	}
 	
+	
+	/**
+	 * Controller method which displays the attendance page to user
+	 * 
+	 * @param model
+	 * @param response
+	 * @param centerId
+	 * @return view
+	 */
+	@RequestMapping(value="/getAttendence", method=RequestMethod.GET)
+	public String getAttendance(Model model, HttpServletResponse response,
+			@CookieValue(value = "CenterId", defaultValue = "BOS") String centerId) {
+		model.addAttribute("attendance",new Attendance());
+		Vocation vocations=vocationService.getVocations(centerId);
+		model.addAttribute("vocations", vocations.getVocations());
+		return "attendance";
+	}
+	
+	/**
+	 * Controller method to submit the attendance for a vocation
+	 * 
+	 * @param attendance
+	 * @param bindingResult
+	 * @param model
+	 * @param centerId
+	 * @return
+	 */
+	@RequestMapping(value="/submitAttendence", method=RequestMethod.POST)
+	public String submitAttendance(Attendance attendance,BindingResult bindingResult, Model model, 
+			@CookieValue(value = "CenterId", defaultValue = "BOS") String centerId) {
+		
+		SubmitAttendanceResponse response=new SubmitAttendanceResponse();
+		
+		if(attendance.getVocation()==null){
+			response.setResponseCode(600);
+			response.setResponseMessage("Please select the Vocation");
+			model.addAttribute("attendance",attendance);
+			Vocation vocations=vocationService.getVocations(centerId);
+			model.addAttribute("vocations", vocations.getVocations());
+			return "attendance";
+		}
+		if(attendance.getStudentIds()==null||attendance.getStudentIds().isEmpty()){
+			response.setResponseCode(700);
+			response.setResponseMessage("Please select the students");
+			model.addAttribute("attendance",attendance);
+			Vocation vocations=vocationService.getVocations(centerId);
+			model.addAttribute("vocations", vocations.getVocations());
+			return "attendance";
+		}
+		//TODO get studentIds
+		attendance.setCenterId(centerId);
+		LocalDate date=helper.getDate(attendance);
+		attendance.setAttendanceDate(date);
+		Attendance alreadyPresent=attendanceService.getAttendance(attendance);
+		Attendance confirmSubmit= null;
+		//Update attendance if already present
+		if(alreadyPresent!=null){
+			attendance.set_id(alreadyPresent.get_id());
+			attendance.setModifiedOn(LocalDate.now());
+			confirmSubmit= attendanceService.updateAttendance(attendance);
+		}
+		else{
+			Integer id=attendanceService.getCount()+1;
+			attendance.set_id(id);
+			attendance.setModifiedOn(LocalDate.now());
+			confirmSubmit= attendanceService.submitAttendance(attendance);
+		}
+		
+		if(confirmSubmit==null){
+			response.setResponseCode(500);
+			response.setResponseMessage("Some problem occured, please try later");
+			model.addAttribute("attendance",attendance);
+		}
+		else{
+			response.setResponseCode(HttpStatus.OK.value());
+			response.setResponseMessage("Attendance submitted successfully");
+		}
+		Vocation vocations=vocationService.getVocations(centerId);
+		model.addAttribute("vocations", vocations.getVocations());
+		return "attendance";
+	}
 	
 }

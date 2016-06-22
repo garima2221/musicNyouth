@@ -5,8 +5,8 @@
 <title>Insert title here</title>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.js"> </script>
-        <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"> </script>
-        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"> </script>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
  				
 </head>
 					
@@ -30,6 +30,9 @@
 
                     success: function(data) {
                     	response($.map(data, function(v,i){
+                    		document.getElementById("student").addEventListener("click", function (){
+                				$("#studentId").val=v.studentId
+                			});
                     	    return {
                     	                label: v.studentName,
                     	                value: v.studentName
@@ -43,12 +46,8 @@
 });
 			
 			
-			
-			
-			
-			
-			
-					</script>	
+</script>
+	
 		<h3>Student Sign Up</h3>
 			<form action="#" th:action="@{/studentSignInDetails}" th:object="${student}" method="get">
 					<div th:if="${errorCodes}">
@@ -72,10 +71,11 @@
 						 	</div>
 					</div>
 					<div class="ui-widget">
-					
+							
 							<label for="student">Student: </label>
  								<input id="student" class="text ui-widget-content ui-corner-all" th:field="*{studentName}"/>
  								<!--  <div th:if="${#fields.hasErrors('studentName')}" th:errors="*{studentName}">Title error message</div>-->
+ 								<input type="hidden" th:field="*{studentId}" id="studentId" />
 					</div>
 					
 						
