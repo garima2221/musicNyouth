@@ -160,7 +160,6 @@ public class StudentController {
 		// name+last name+middle name(if not null)+centerId
 		student.setUserId(student.getStudentId());
 		student.setPassword(student.getStudentId());
-		//student.deleteAll();
 		Student studentSaved = studentService.studentSave(student);
 
 		if (studentSaved == null) {
